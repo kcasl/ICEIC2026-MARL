@@ -1,0 +1,41 @@
+map_id: '00035'
+seed: 3035
+map_type: paired_l
+note: ㄴ자 시작 구역과 옆방. 문 양쪽에 발판이 있다.
+width: 16
+height: 22
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: north
+goal_side: south
+independent_regions: false
+clear_condition: all_agents_reach_goal
+feature: plate
+name: 발판
+asset: assets/tiles/plate.png
+color:
+- 245
+- 196
+- 0
+mode: hold
+occupied_by:
+- agent
+- movable_object
+plates:
+- id: plate_0
+  x: 9
+  y: 2
+  region: 0
+  opens:
+  - door_0
+  mode: hold
+- id: plate_1
+  x: 12
+  y: 16
+  region: 1
+  opens:
+  - door_0
+  mode: hold

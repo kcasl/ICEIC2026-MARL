@@ -1,0 +1,23 @@
+map_id: '00004'
+seed: 3004
+map_type: split_vertical
+note: 좌우로 완전히 분리. 문마다 들어가는 쪽에 발판이 있고, 두 발판을 모두 밟아야 문이 열린다.
+width: 26
+height: 18
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: north
+goal_side: south
+independent_regions: true
+clear_condition: each_agent_reaches_own_goal
+feature: object
+name: 옮길 수 있는 오브젝트
+asset: assets/tiles/object.png
+color:
+- 146
+- 98
+- 56
+objects: []

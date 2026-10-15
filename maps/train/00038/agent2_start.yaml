@@ -1,0 +1,27 @@
+map_id: 00038
+seed: 3038
+map_type: crate_s
+note: S자 복도. 문 앞 발판이 하나이고, 물건을 발판에 올린 뒤 지나간다.
+width: 22
+height: 18
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: west
+goal_side: east
+independent_regions: false
+clear_condition: all_agents_reach_goal
+feature: agent2_start
+name: Agent2 시작지점
+asset: assets/tiles/agent2_start.png
+color:
+- 150
+- 70
+- 180
+x: 3
+y: 1
+side: west
+region: 0
+separated_from_agent1: true

@@ -1,0 +1,31 @@
+map_id: '00047'
+seed: 3047
+map_type: paired_offset
+note: 어긋난 두 방. 문 양쪽에 발판이 있다.
+width: 16
+height: 23
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: north
+goal_side: south
+independent_regions: false
+clear_condition: all_agents_reach_goal
+feature: goal
+name: 도착지점
+asset: assets/tiles/goal.png
+color:
+- 30
+- 160
+- 90
+x: 14
+y: 21
+side: south
+goals:
+- id: goal_0
+  x: 14
+  y: 21
+  agent: both
+  side: south

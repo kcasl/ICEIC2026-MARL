@@ -1,0 +1,35 @@
+map_id: '00041'
+seed: 3041
+map_type: paired_offset
+note: 어긋난 두 방. 문 양쪽에 발판이 있다.
+width: 21
+height: 15
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: west
+goal_side: east
+independent_regions: false
+clear_condition: all_agents_reach_goal
+feature: door
+name: 문
+asset: assets/tiles/door.png
+color:
+- 176
+- 58
+- 46
+logic: any
+mode: hold
+description: 연결된 발판 중 하나라도 에이전트나 물건이 올려져 있는 동안 열린다
+doors:
+- id: door_0
+  x: 9
+  y: 9
+  opened_by:
+  - plate_0
+  - plate_1
+  logic: any
+  mode: hold
+  initial_open: false

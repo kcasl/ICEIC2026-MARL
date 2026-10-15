@@ -1,0 +1,42 @@
+map_id: '00030'
+seed: 3030
+map_type: crate_straight
+note: 복도. 문 앞 발판이 하나이고, 물건을 발판 위로 밀어 문을 연 뒤 지나간다.
+width: 20
+height: 15
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: west
+goal_side: east
+independent_regions: false
+clear_condition: all_agents_reach_goal
+feature: object
+name: 옮길 수 있는 오브젝트
+asset: assets/tiles/object.png
+color:
+- 146
+- 98
+- 56
+objects:
+- id: object_0
+  x: 4
+  y: 9
+  pushable: true
+  requires_both_agents: true
+  pushes_onto_plate: plate_0
+  plate_distance: 3
+  stand_cells:
+  - - 4
+    - 8
+  - - 5
+    - 8
+  push_neighbors:
+  - direction: south
+    x: 4
+    y: 12
+    onto_plate: plate_0
+    distance: 3
+    requires_both_agents: true

@@ -1,0 +1,40 @@
+map_id: '00046'
+seed: 3046
+map_type: split_vertical
+note: 좌우로 완전히 분리. 문마다 들어가는 쪽에 발판이 있고, 두 발판을 모두 밟아야 문이 열린다.
+width: 24
+height: 18
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: north
+goal_side: south
+independent_regions: true
+clear_condition: each_agent_reaches_own_goal
+feature: goal
+name: 도착지점
+asset: assets/tiles/goal.png
+color:
+- 30
+- 160
+- 90
+x: 4
+y: 16
+side: south
+goals:
+- id: goal_1
+  x: 4
+  y: 16
+  agent: '1'
+  side: south
+  reachable_alone: false
+  requires_agent: '2'
+- id: goal_2
+  x: 15
+  y: 16
+  agent: '2'
+  side: south
+  reachable_alone: false
+  requires_agent: '1'

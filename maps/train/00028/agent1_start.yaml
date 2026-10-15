@@ -1,0 +1,27 @@
+map_id: 00028
+seed: 3028
+map_type: split_horizontal
+note: 상하로 완전히 분리. 문마다 들어가는 쪽에 발판이 있고, 두 발판을 모두 밟아야 문이 열린다.
+width: 18
+height: 24
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: west
+goal_side: east
+independent_regions: true
+clear_condition: each_agent_reaches_own_goal
+feature: agent1_start
+name: Agent1 시작지점
+asset: assets/tiles/agent1_start.png
+color:
+- 36
+- 120
+- 190
+x: 1
+y: 3
+side: west
+region: 0
+separated_from_agent2: true

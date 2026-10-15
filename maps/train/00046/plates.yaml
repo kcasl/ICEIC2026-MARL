@@ -1,0 +1,46 @@
+map_id: '00046'
+seed: 3046
+map_type: split_vertical
+note: 좌우로 완전히 분리. 문마다 들어가는 쪽에 발판이 있고, 두 발판을 모두 밟아야 문이 열린다.
+width: 24
+height: 18
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: north
+goal_side: south
+independent_regions: true
+clear_condition: each_agent_reaches_own_goal
+feature: plate
+name: 발판
+asset: assets/tiles/plate.png
+color:
+- 245
+- 196
+- 0
+mode: latch
+occupied_by:
+- agent
+plates:
+- id: plate_0
+  x: 4
+  y: 7
+  region: 0
+  opens: &id001
+  - door_0
+  - door_1
+  mode: latch
+  pressed_by_agent: '1'
+  required_for_doors: *id001
+- id: plate_1
+  x: 15
+  y: 7
+  region: 1
+  opens: &id002
+  - door_0
+  - door_1
+  mode: latch
+  pressed_by_agent: '2'
+  required_for_doors: *id002

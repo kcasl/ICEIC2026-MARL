@@ -1,0 +1,52 @@
+map_id: '00046'
+seed: 3046
+map_type: split_vertical
+note: 좌우로 완전히 분리. 문마다 들어가는 쪽에 발판이 있고, 두 발판을 모두 밟아야 문이 열린다.
+width: 24
+height: 18
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: north
+goal_side: south
+independent_regions: true
+clear_condition: each_agent_reaches_own_goal
+feature: door
+name: 문
+asset: assets/tiles/door.png
+color:
+- 176
+- 58
+- 46
+logic: all
+mode: latch
+description: 각 문 앞 발판을 포함해 연결된 발판이 모두 한 번씩 밟히면 열린 채로 유지된다. 한쪽만 밟아서는 나갈 수 없다.
+doors:
+- id: door_0
+  x: 4
+  y: 10
+  opened_by:
+  - plate_0
+  - plate_1
+  logic: all
+  mode: latch
+  initial_open: false
+  blocks_agent: '1'
+  opened_by_agents:
+  - '1'
+  - '2'
+- id: door_1
+  x: 15
+  y: 10
+  opened_by:
+  - plate_0
+  - plate_1
+  logic: all
+  mode: latch
+  initial_open: false
+  blocks_agent: '2'
+  opened_by_agents:
+  - '1'
+  - '2'

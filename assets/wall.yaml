@@ -1,0 +1,12 @@
+id: wall
+name: 벽
+file: assets/tiles/wall.png
+cell_size: 32
+color:
+- 0
+- 0
+- 0
+sample_pixel:
+- 2
+- 2
+blocks_movement: true

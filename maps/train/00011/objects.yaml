@@ -1,0 +1,42 @@
+map_id: '00011'
+seed: 3011
+map_type: paired_offset
+note: 어긋난 두 방. 문 양쪽에 발판이 있다.
+width: 21
+height: 15
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: west
+goal_side: east
+independent_regions: false
+clear_condition: all_agents_reach_goal
+feature: object
+name: 옮길 수 있는 오브젝트
+asset: assets/tiles/object.png
+color:
+- 146
+- 98
+- 56
+objects:
+- id: object_0
+  x: 5
+  y: 8
+  pushable: true
+  requires_both_agents: true
+  pushes_onto_plate: null
+  plate_distance: 3
+  stand_cells:
+  - - 5
+    - 7
+  - - 6
+    - 7
+  push_neighbors:
+  - direction: north
+    x: 5
+    y: 7
+    onto_plate: null
+    distance: 1
+    requires_both_agents: true

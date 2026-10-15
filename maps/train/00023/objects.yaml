@@ -1,0 +1,42 @@
+map_id: '00023'
+seed: 3023
+map_type: paired_l
+note: ㄴ자 시작 구역과 옆방. 문 양쪽에 발판이 있다.
+width: 16
+height: 22
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: north
+goal_side: south
+independent_regions: false
+clear_condition: all_agents_reach_goal
+feature: object
+name: 옮길 수 있는 오브젝트
+asset: assets/tiles/object.png
+color:
+- 146
+- 98
+- 56
+objects:
+- id: object_0
+  x: 4
+  y: 2
+  pushable: true
+  requires_both_agents: true
+  pushes_onto_plate: null
+  plate_distance: 5
+  stand_cells:
+  - - 3
+    - 2
+  - - 3
+    - 1
+  push_neighbors:
+  - direction: east
+    x: 5
+    y: 2
+    onto_plate: null
+    distance: 1
+    requires_both_agents: true

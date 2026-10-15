@@ -1,0 +1,12 @@
+id: door
+name: 문
+file: assets/tiles/door.png
+cell_size: 32
+color:
+- 176
+- 58
+- 46
+sample_pixel:
+- 2
+- 2
+blocks_movement: false

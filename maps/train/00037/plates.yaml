@@ -1,0 +1,34 @@
+map_id: '00037'
+seed: 3037
+map_type: crate_bend
+note: ㄱ자 복도. 문 앞 발판이 하나이고, 물건을 발판에 올린 뒤 지나간다.
+width: 20
+height: 17
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: north
+goal_side: south
+independent_regions: false
+clear_condition: all_agents_reach_goal
+feature: plate
+name: 발판
+asset: assets/tiles/plate.png
+color:
+- 245
+- 196
+- 0
+mode: hold
+occupied_by:
+- agent
+- movable_object
+plates:
+- id: plate_0
+  x: 12
+  y: 7
+  region: 0
+  opens:
+  - door_0
+  mode: hold

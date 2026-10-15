@@ -1,0 +1,41 @@
+map_id: '00011'
+seed: 3011
+map_type: paired_offset
+note: 어긋난 두 방. 문 양쪽에 발판이 있다.
+width: 21
+height: 15
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: west
+goal_side: east
+independent_regions: false
+clear_condition: all_agents_reach_goal
+feature: plate
+name: 발판
+asset: assets/tiles/plate.png
+color:
+- 245
+- 196
+- 0
+mode: hold
+occupied_by:
+- agent
+- movable_object
+plates:
+- id: plate_0
+  x: 2
+  y: 8
+  region: 0
+  opens:
+  - door_0
+  mode: hold
+- id: plate_1
+  x: 15
+  y: 8
+  region: 1
+  opens:
+  - door_0
+  mode: hold

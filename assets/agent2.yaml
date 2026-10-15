@@ -1,0 +1,13 @@
+id: agent2
+name: Agent2
+file: assets/tiles/agent2.png
+cell_size: 32
+color:
+- 150
+- 70
+- 180
+sample_pixel:
+- 2
+- 2
+blocks_movement: false
+kind: agent

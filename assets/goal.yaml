@@ -1,0 +1,12 @@
+id: goal
+name: 도착지점
+file: assets/tiles/goal.png
+cell_size: 32
+color:
+- 30
+- 160
+- 90
+sample_pixel:
+- 2
+- 2
+blocks_movement: false

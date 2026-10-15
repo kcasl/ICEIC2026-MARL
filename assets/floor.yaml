@@ -1,0 +1,12 @@
+id: floor
+name: 바닥
+file: assets/tiles/floor.png
+cell_size: 32
+color:
+- 255
+- 255
+- 255
+sample_pixel:
+- 2
+- 2
+blocks_movement: false

@@ -1,0 +1,34 @@
+map_id: '00042'
+seed: 3042
+map_type: crate_straight
+note: 복도. 문 앞 발판이 하나이고, 물건을 발판 위로 밀어 문을 연 뒤 지나간다.
+width: 14
+height: 22
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: north
+goal_side: south
+independent_regions: false
+clear_condition: all_agents_reach_goal
+feature: door
+name: 문
+asset: assets/tiles/door.png
+color:
+- 176
+- 58
+- 46
+logic: any
+mode: hold
+description: 연결된 발판 중 하나라도 에이전트나 물건이 올려져 있는 동안 열린다
+doors:
+- id: door_0
+  x: 4
+  y: 16
+  opened_by:
+  - plate_0
+  logic: any
+  mode: hold
+  initial_open: false

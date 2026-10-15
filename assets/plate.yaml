@@ -1,0 +1,12 @@
+id: plate
+name: 발판
+file: assets/tiles/plate.png
+cell_size: 32
+color:
+- 245
+- 196
+- 0
+sample_pixel:
+- 2
+- 2
+blocks_movement: false

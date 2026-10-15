@@ -1,0 +1,27 @@
+map_id: '00047'
+seed: 3047
+map_type: paired_offset
+note: 어긋난 두 방. 문 양쪽에 발판이 있다.
+width: 16
+height: 23
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: north
+goal_side: south
+independent_regions: false
+clear_condition: all_agents_reach_goal
+feature: agent1_start
+name: Agent1 시작지점
+asset: assets/tiles/agent1_start.png
+color:
+- 36
+- 120
+- 190
+x: 2
+y: 2
+side: north
+region: 0
+separated_from_agent2: true

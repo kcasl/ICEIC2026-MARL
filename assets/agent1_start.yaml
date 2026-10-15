@@ -1,0 +1,12 @@
+id: agent1_start
+name: Agent1 시작지점
+file: assets/tiles/agent1_start.png
+cell_size: 32
+color:
+- 36
+- 120
+- 190
+sample_pixel:
+- 2
+- 2
+blocks_movement: false

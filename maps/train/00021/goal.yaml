@@ -1,0 +1,31 @@
+map_id: '00021'
+seed: 3021
+map_type: crate_chain
+note: 문이 두 개. 각 문 앞에 발판과 물건이 있어 순서대로 올리고 지나간다.
+width: 30
+height: 14
+cell_size: 32
+origin: top_left
+axes:
+  x: right
+  y: down
+start_side: west
+goal_side: east
+independent_regions: false
+clear_condition: all_agents_reach_goal
+feature: goal
+name: 도착지점
+asset: assets/tiles/goal.png
+color:
+- 30
+- 160
+- 90
+x: 28
+y: 2
+side: east
+goals:
+- id: goal_0
+  x: 28
+  y: 2
+  agent: both
+  side: east
