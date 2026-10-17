@@ -21,11 +21,11 @@ color:
 - 160
 - 90
 x: 22
-y: 2
+y: 6
 side: east
 goals:
 - id: goal_0
   x: 22
-  y: 2
+  y: 6
   agent: both
   side: east

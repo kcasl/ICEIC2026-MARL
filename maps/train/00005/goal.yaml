@@ -2,8 +2,8 @@ map_id: '00005'
 seed: 3005
 map_type: paired_l
 note: ㄴ자 시작 구역과 옆방. 문 양쪽에 발판이 있다.
-width: 22
-height: 16
+width: 24
+height: 18
 cell_size: 32
 origin: top_left
 axes:
@@ -20,12 +20,12 @@ color:
 - 30
 - 160
 - 90
-x: 20
+x: 22
 y: 13
 side: east
 goals:
 - id: goal_0
-  x: 20
+  x: 22
   y: 13
   agent: both
   side: east

@@ -26,8 +26,8 @@ occupied_by:
 - movable_object
 plates:
 - id: plate_0
-  x: 6
-  y: 7
+  x: 7
+  y: 8
   region: 0
   opens:
   - door_0

@@ -27,7 +27,7 @@ occupied_by:
 plates:
 - id: plate_0
   x: 6
-  y: 7
+  y: 10
   region: 0
   opens:
   - door_0

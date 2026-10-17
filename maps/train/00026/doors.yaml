@@ -2,8 +2,8 @@ map_id: '00026'
 seed: 3026
 map_type: crate_s
 note: S자 복도. 문 앞 발판이 하나이고, 물건을 발판에 올린 뒤 지나간다.
-width: 26
-height: 18
+width: 28
+height: 22
 cell_size: 32
 origin: top_left
 axes:
@@ -26,7 +26,14 @@ description: 연결된 발판 중 하나라도 에이전트나 물건이 올려�
 doors:
 - id: door_0
   x: 13
-  y: 1
+  y: 2
+  cells:
+  - - 13
+    - 2
+  - - 13
+    - 1
+  - - 13
+    - 3
   opened_by:
   - plate_0
   logic: any

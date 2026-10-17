@@ -23,20 +23,20 @@ color:
 objects:
 - id: object_0
   x: 6
-  y: 4
+  y: 7
   pushable: true
   requires_both_agents: true
   pushes_onto_plate: plate_0
   plate_distance: 3
   stand_cells:
   - - 6
-    - 3
+    - 6
   - - 7
-    - 3
+    - 6
   push_neighbors:
   - direction: south
     x: 6
-    y: 7
+    y: 10
     onto_plate: plate_0
     distance: 3
     requires_both_agents: true

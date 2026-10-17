@@ -21,7 +21,7 @@ color:
 - 120
 - 190
 x: 1
-y: 2
+y: 5
 side: west
 region: 0
 separated_from_agent2: true

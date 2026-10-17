@@ -26,7 +26,14 @@ description: 연결된 발판 중 하나라도 에이전트나 물건이 올려�
 doors:
 - id: door_0
   x: 19
-  y: 2
+  y: 6
+  cells:
+  - - 19
+    - 6
+  - - 19
+    - 5
+  - - 19
+    - 7
   opened_by:
   - plate_0
   logic: any

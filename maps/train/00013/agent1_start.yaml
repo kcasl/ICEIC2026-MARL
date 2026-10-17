@@ -2,8 +2,8 @@ map_id: '00013'
 seed: 3013
 map_type: crate_bend
 note: ㄱ자 복도. 문 앞 발판이 하나이고, 물건을 발판에 올린 뒤 지나간다.
-width: 20
-height: 17
+width: 22
+height: 19
 cell_size: 32
 origin: top_left
 axes:
@@ -20,8 +20,8 @@ color:
 - 36
 - 120
 - 190
-x: 17
-y: 1
+x: 18
+y: 2
 side: north
 region: 0
 separated_from_agent2: true

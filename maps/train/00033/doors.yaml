@@ -2,8 +2,8 @@ map_id: '00033'
 seed: 3033
 map_type: crate_chain
 note: 문이 두 개. 각 문 앞에 발판과 물건이 있어 순서대로 올리고 지나간다.
-width: 32
-height: 14
+width: 34
+height: 16
 cell_size: 32
 origin: top_left
 axes:
@@ -25,16 +25,30 @@ mode: hold
 description: 연결된 발판 중 하나라도 에이전트나 물건이 올려져 있는 동안 열린다
 doors:
 - id: door_0
-  x: 12
-  y: 2
+  x: 13
+  y: 3
+  cells:
+  - - 13
+    - 3
+  - - 13
+    - 2
+  - - 13
+    - 4
   opened_by:
   - plate_0
   logic: any
   mode: hold
   initial_open: false
 - id: door_1
-  x: 24
-  y: 2
+  x: 26
+  y: 3
+  cells:
+  - - 26
+    - 3
+  - - 26
+    - 2
+  - - 26
+    - 4
   opened_by:
   - plate_1
   logic: any

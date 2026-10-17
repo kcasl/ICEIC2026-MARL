@@ -27,6 +27,13 @@ doors:
 - id: door_0
   x: 4
   y: 10
+  cells:
+  - - 4
+    - 10
+  - - 3
+    - 10
+  - - 5
+    - 10
   opened_by:
   - plate_0
   - plate_1
@@ -40,6 +47,13 @@ doors:
 - id: door_1
   x: 15
   y: 10
+  cells:
+  - - 15
+    - 10
+  - - 14
+    - 10
+  - - 16
+    - 10
   opened_by:
   - plate_0
   - plate_1

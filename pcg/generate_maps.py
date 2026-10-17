@@ -88,6 +88,8 @@ class Door:
     id: str
     cell: tuple[int, int]
     opened_by: list[str]
+    # 문 개구는 한 칸이 아니라 이 칸들을 포함해 세 칸이다. 두 에이전트가 나란히 지나간다.
+    span: list[tuple[int, int]] = field(default_factory=list)
 
 
 @dataclass
@@ -253,8 +255,35 @@ def carve_coop_lane(
     cells.extend((crate[0] + i * dx, crate[1] + i * dy) for i in range(1, distance))
     if len(set(cells)) != len(cells) or any(not inside(grid, *cell) for cell in cells):
         return None
-    carve(grid, cells)
+    # 밀기 통로도 세 칸 폭으로 깐다. 한 칸짜리는 둘이 붙어서 밀 자리가 없다.
+    lateral = (assist[0] - behind[0], assist[1] - behind[1])
+    wide: list[tuple[int, int]] = []
+    for cell in cells:
+        for sign in (1, -1):
+            wide.append((cell[0] + sign * lateral[0], cell[1] + sign * lateral[1]))
+    if any(not inside(grid, *cell) for cell in wide):
+        return None
+    carve(grid, cells + wide)
     return crate, plate
+
+
+def paint_door(
+    grid: list[list[str]],
+    anchor: tuple[int, int],
+    lateral: tuple[int, int],
+) -> tuple[tuple[int, int], list[tuple[int, int]]] | None:
+    """문을 세 칸 폭으로 연다. 가운데 칸이 대표 좌표다."""
+    lx, ly = lateral
+    cells = [
+        (anchor[0] - lx, anchor[1] - ly),
+        anchor,
+        (anchor[0] + lx, anchor[1] + ly),
+    ]
+    if any(not inside(grid, *cell) for cell in cells):
+        return None
+    for x, y in cells:
+        grid[y][x] = DOOR
+    return cells[1], [cells[0], cells[2]]
 
 
 def flood(origin: tuple[int, int], passable: set[tuple[int, int]]) -> set[tuple[int, int]]:
@@ -290,7 +319,31 @@ def passable_cells(
 
 
 def door_cells(spec: Spec) -> set[tuple[int, int]]:
-    return {door.cell for door in spec.doors}
+    cells: set[tuple[int, int]] = set()
+    for door in spec.doors:
+        cells.update(cells_of(door))
+    return cells
+
+
+def cells_of(door: Door) -> set[tuple[int, int]]:
+    return {door.cell, *door.span}
+
+
+def validate_clearance(spec: Spec) -> None:
+    """한 칸짜리 목은 거른다. 두 에이전트가 나란히 설 폭이 남아 있어야 한다."""
+    height, width = spec.height, spec.width
+
+    def is_wall(x: int, y: int) -> bool:
+        if not (0 <= x < width and 0 <= y < height):
+            return True
+        return spec.grid[y][x] == WALL
+
+    for y in range(height):
+        for x in range(width):
+            if spec.grid[y][x] == WALL:
+                continue
+            if (is_wall(x - 1, y) and is_wall(x + 1, y)) or (is_wall(x, y - 1) and is_wall(x, y + 1)):
+                raise AssertionError(f"passage at {(x, y)} is only one cell wide")
 
 
 def opposite(side: str) -> str:
@@ -386,6 +439,7 @@ def reaches(spec: Spec, origin: tuple[int, int], blocked: set[tuple[int, int]], 
 
 def validate(spec: Spec) -> None:
     validate_spacing(spec)
+    validate_clearance(spec)
     validate_plates_for_doors(spec)
     if spec.map_type.startswith("crate"):
         validate_crate(spec)
@@ -399,7 +453,10 @@ def validate(spec: Spec) -> None:
     for plate in spec.plates:
         claimed[plate.cell] = plate.id
     for door in spec.doors:
-        claimed[door.cell] = door.id
+        for cell in (door.cell, *door.span):
+            if cell in claimed and claimed[cell] != door.id:
+                raise AssertionError("overlapping door")
+            claimed[cell] = door.id
     for crate in spec.crates:
         if crate.cell in claimed:
             raise AssertionError("overlapping crate")
@@ -433,7 +490,7 @@ def validate_crate(spec: Spec) -> None:
     remaining = {door.id: door for door in spec.doors}
     frontier_blocked: set[tuple[int, int]] = set()
     while remaining:
-        seen = reaches(spec, spec.agent1, frontier_blocked, {door.cell for door in spec.doors if door.id not in remaining} | set())
+        seen = reaches(spec, spec.agent1, frontier_blocked, set().union(*(cells_of(door) for door in spec.doors if door.id not in remaining)))
         # doors still closed: find one whose entry is already reached
         ready = []
         for door in remaining.values():
@@ -472,7 +529,7 @@ def validate_crate(spec: Spec) -> None:
             raise AssertionError("goal is reachable before this door is held open")
         lifted.add(crate.cell)
         parked.add(plate.cell)
-        open_now.add(door.cell)
+        open_now.update(cells_of(door))
     final = reaches(spec, spec.agent1, parked, open_now)
     if spec.agent2 not in final or any(goal.cell not in final for goal in spec.goals):
         raise AssertionError("pushing every crate onto its plate does not open a path to the goal")
@@ -518,9 +575,9 @@ def doors_open_for(spec: Spec, pressed_ids: set[str]) -> set[tuple[int, int]]:
             continue
         if spec.independent:
             if needed <= pressed_ids:
-                cells.add(door.cell)
+                cells.update(cells_of(door))
         elif needed & pressed_ids:
-            cells.add(door.cell)
+            cells.update(cells_of(door))
     return cells
 
 
@@ -592,7 +649,7 @@ def validate_paired(spec: Spec) -> None:
     if spec.goals[0].cell in closed:
         raise AssertionError("goal is on the start side of the door")
     blocked = {crate.cell for crate in spec.crates}
-    opened = reaches(spec, spec.agent1, blocked, {door.cell})
+    opened = reaches(spec, spec.agent1, blocked, cells_of(door))
     if spec.agent2 not in opened or spec.goals[0].cell not in opened or far[0].cell not in opened:
         raise AssertionError("opening the door does not connect both plates and the goal")
 
@@ -612,7 +669,10 @@ def transpose(spec: Spec) -> Spec:
 
     side_map = {"west": "north", "east": "south", "north": "west", "south": "east"}
     plates = [Plate(plate.id, point(plate.cell), list(plate.opens), plate.region) for plate in spec.plates]
-    doors = [Door(door.id, point(door.cell), list(door.opened_by)) for door in spec.doors]
+    doors = [
+        Door(door.id, point(door.cell), list(door.opened_by), [point(cell) for cell in door.span])
+        for door in spec.doors
+    ]
     crates = []
     for crate in spec.crates:
         origin = point(crate.cell)
@@ -694,32 +754,33 @@ def finish_crate(
 def build_crate_straight(seed: int, map_id: str) -> Spec | None:
     rng = random.Random(seed)
     width = rng.choice((20, 22, 24))
-    height = rng.choice((14, 15, 16))
-    y0 = rng.randint(1, height - 8)
+    height = rng.choice((16, 18))
+    y0 = rng.randint(1, height - 10)
     lane_x = rng.randint(4, 7)
     door_x = rng.randint(max(lane_x + 3, 11), width - 5)
     grid = blank(width, height)
-    carve_rect(grid, 1, y0, width - 2, y0 + 1)
+    carve_rect(grid, 1, y0, width - 2, y0 + 2)
     if rng.random() < 0.65:
-        carve_rect(grid, door_x + 1, y0, width - 2, min(height - 2, y0 + 3))
-    for y in (y0, y0 + 1):
-        grid[y][door_x] = WALL
-    grid[y0][door_x] = DOOR
+        carve_rect(grid, door_x + 1, y0, width - 2, min(height - 2, y0 + 4))
+    painted = paint_door(grid, (door_x, y0 + 1), (0, 1))
+    if painted is None:
+        return None
+    door_cell, door_span = painted
     behind = (lane_x, y0 + 1)
     assist = (lane_x + 1, y0 + 1)
     placed = carve_coop_lane(grid, behind, assist, (0, 1))
     if placed is None:
         return None
     box, plate = placed
-    for y in range(y0 + 2, height - 1):
+    for y in range(y0 + 3, height - 1):
         if grid[y][door_x] == FLOOR:
             grid[y][door_x] = WALL
     agent1 = (1, y0)
     agent2 = (2, y0)
     spec = finish_crate(
-        grid, width, height, "x", "west", "east", (agent1, agent2), (width - 2, y0),
+        grid, width, height, "x", "west", "east", (agent1, agent2), (width - 2, y0 + 1),
         [Plate("plate_0", plate, ["door_0"], 0)],
-        [Door("door_0", (door_x, y0), ["plate_0"])],
+        [Door("door_0", door_cell, ["plate_0"], door_span)],
         [Crate("object_0", box, [push_record(box, plate, "plate_0")], [behind, assist])],
         True, map_id, seed, "crate_straight",
     )
@@ -731,10 +792,10 @@ def build_crate_straight(seed: int, map_id: str) -> Spec | None:
 
 def build_crate_bend(seed: int, map_id: str) -> Spec | None:
     rng = random.Random(seed)
-    width = rng.choice((16, 18, 20))
-    height = rng.choice((15, 17))
-    top = rng.choice((2, 3))
-    shaft_w = 2
+    width = rng.choice((18, 20, 22))
+    height = rng.choice((17, 19))
+    top = 3
+    shaft_w = 3
     east = rng.random() < 0.5
     grid = blank(width, height)
     carve_rect(grid, 1, 1, width - 2, top)
@@ -746,12 +807,12 @@ def build_crate_bend(seed: int, map_id: str) -> Spec | None:
         shaft_x0 = 1
         carve_rect(grid, 1, 1, shaft_w, height - 2)
         direction = 1
-    door_y = rng.randint(top + 5, height - 4)
+    door_y = rng.randint(top + 5, height - 5)
     shaft_xs = list(range(shaft_x0, shaft_x0 + shaft_w))
-    for x in shaft_xs:
-        grid[door_y][x] = WALL
-    door_x = shaft_xs[0]
-    grid[door_y][door_x] = DOOR
+    painted = paint_door(grid, (shaft_xs[1], door_y), (1, 0))
+    if painted is None:
+        return None
+    door_cell, door_span = painted
     edge = shaft_xs[0] if east else shaft_xs[-1]
     behind = (edge + direction, door_y - 2)
     assist = (edge + direction, door_y - 3)
@@ -759,9 +820,9 @@ def build_crate_bend(seed: int, map_id: str) -> Spec | None:
     if placed is None:
         return None
     box, plate = placed
-    goal = (shaft_xs[-1], height - 2)
-    agent1 = (2 if east else width - 3, 1)
-    agent2 = (5 if east else width - 6, top)
+    goal = (shaft_xs[1], height - 2)
+    agent1 = (3 if east else width - 4, 2)
+    agent2 = (6 if east else width - 7, top)
     if not inside(grid, *agent2) or grid[agent2[1]][agent2[0]] != FLOOR:
         return None
     if agent1 in (box, plate, behind, assist) or agent2 in (box, plate, behind, assist):
@@ -769,7 +830,7 @@ def build_crate_bend(seed: int, map_id: str) -> Spec | None:
     spec = finish_crate(
         grid, width, height, "y", "north", "south", (agent1, agent2), goal,
         [Plate("plate_0", plate, ["door_0"], 0)],
-        [Door("door_0", (door_x, door_y), ["plate_0"])],
+        [Door("door_0", door_cell, ["plate_0"], door_span)],
         [Crate("object_0", box, [push_record(box, plate, "plate_0")], [behind, assist])],
         abs(agent1[0] - agent2[0]) >= 3, map_id, seed, "crate_bend",
     )
@@ -779,22 +840,23 @@ def build_crate_bend(seed: int, map_id: str) -> Spec | None:
 def build_crate_s(seed: int, map_id: str) -> Spec | None:
     rng = random.Random(seed)
     gap = 5
-    lane = 2
+    lane = 3
     y0 = 1
     y1 = y0 + lane + gap
     y2 = y1 + lane + gap
-    height = y2 + lane + 1
-    width = rng.choice((22, 24, 26))
+    height = y2 + lane + 2
+    width = rng.choice((24, 26, 28))
     door_x = rng.randint(12, 15)
     grid = blank(width, height)
     carve_rect(grid, 1, y0, width - 2, y0 + lane - 1)
     carve_rect(grid, 1, y1, width - 2, y1 + lane - 1)
     carve_rect(grid, 1, y2, width - 2, y2 + lane - 1)
-    carve_rect(grid, width - 3, y0, width - 2, y1 + lane - 1)
-    carve_rect(grid, 1, y1, 2, y2 + lane - 1)
-    for y in range(y0, y0 + lane):
-        grid[y][door_x] = WALL
-    grid[y0][door_x] = DOOR
+    carve_rect(grid, width - 4, y0, width - 2, y1 + lane - 1)
+    carve_rect(grid, 1, y1, 3, y2 + lane - 1)
+    painted = paint_door(grid, (door_x, y0 + 1), (0, 1))
+    if painted is None:
+        return None
+    door_cell, door_span = painted
     behind = (door_x - 6, y0 + 1)
     assist = (door_x - 5, y0 + 1)
     placed = carve_coop_lane(grid, behind, assist, (0, 1))
@@ -802,12 +864,12 @@ def build_crate_s(seed: int, map_id: str) -> Spec | None:
         return None
     box, plate = placed
     agent1 = (2, y0)
-    agent2 = (3, y0)
-    goal = (width - 2, y2 + lane - 1)
+    agent2 = (3, y0 + 1)
+    goal = (width - 3, y2 + 1)
     spec = finish_crate(
         grid, width, height, "x", "west", "east", (agent1, agent2), goal,
         [Plate("plate_0", plate, ["door_0"], 0)],
-        [Door("door_0", (door_x, y0), ["plate_0"])],
+        [Door("door_0", door_cell, ["plate_0"], door_span)],
         [Crate("object_0", box, [push_record(box, plate, "plate_0")], [behind, assist])],
         True, map_id, seed, "crate_s",
     )
@@ -818,34 +880,35 @@ def build_crate_s(seed: int, map_id: str) -> Spec | None:
 
 def build_crate_chain(seed: int, map_id: str) -> Spec | None:
     rng = random.Random(seed)
-    width = rng.choice((30, 32))
-    height = 14
+    width = rng.choice((32, 34))
+    height = 16
     y0 = 2
     grid = blank(width, height)
-    carve_rect(grid, 1, y0, width - 2, y0 + 1)
+    carve_rect(grid, 1, y0, width - 2, y0 + 2)
     doors = []
     plates = []
     crates = []
-    for index, (lane_x, door_x) in enumerate(((4, 12), (16, 24))):
-        grid[y0][door_x] = WALL
-        grid[y0 + 1][door_x] = WALL
-        grid[y0][door_x] = DOOR
+    for index, (lane_x, door_x) in enumerate(((4, 13), (18, 26))):
+        painted = paint_door(grid, (door_x, y0 + 1), (0, 1))
+        if painted is None:
+            return None
+        door_cell, door_span = painted
         behind = (lane_x, y0 + 1)
         assist = (lane_x + 1, y0 + 1)
         placed = carve_coop_lane(grid, behind, assist, (0, 1))
         if placed is None:
             return None
         box, plate = placed
-        for y in range(y0 + 2, height - 1):
+        for y in range(y0 + 3, height - 1):
             if grid[y][door_x] == FLOOR:
                 grid[y][door_x] = WALL
         plate_id = f"plate_{index}"
         door_id = f"door_{index}"
         plates.append(Plate(plate_id, plate, [door_id], 0))
-        doors.append(Door(door_id, (door_x, y0), [plate_id]))
+        doors.append(Door(door_id, door_cell, [plate_id], door_span))
         crates.append(Crate(f"object_{index}", box, [push_record(box, plate, plate_id)], [behind, assist]))
     spec = finish_crate(
-        grid, width, height, "x", "west", "east", ((1, y0), (2, y0 + 1)), (width - 2, y0),
+        grid, width, height, "x", "west", "east", ((2, y0 + 1), (4, y0 + 1)), (width - 3, y0 + 1),
         plates, doors, crates, True, map_id, seed, "crate_chain",
     )
     if rng.random() < 0.5:
@@ -876,11 +939,14 @@ def build_split(seed: int, map_id: str) -> Spec | None:
         carve_rect(grid, x0, door_y + 1, x1, height - 2)
         for x in range(x0, x1 + 1):
             grid[door_y][x] = WALL
-        grid[door_y][door_x] = DOOR
+        painted = paint_door(grid, (door_x, door_y), (1, 0))
+        if painted is None:
+            return None
+        door_cell, door_span = painted
         # One plate sits on the approach side of this door, with a gap before the door.
         plate = (door_x, door_y - 3)
         plates.append(Plate(f"plate_{index}", plate, [], index))
-        doors.append(Door(f"door_{index}", (door_x, door_y), []))
+        doors.append(Door(f"door_{index}", door_cell, [], door_span))
         goals.append((door_x, height - 2))
     agent1 = (regions[0][2], 1)
     agent2 = (regions[1][2], 1)
@@ -952,10 +1018,13 @@ def build_paired_offset(rng: random.Random, seed: int, map_id: str) -> Spec | No
                 grid[y][x] = WALL
     door_x = sx1 + 1
     overlap = [y for y in range(max(gy0, 1), min(sy1, height - 2) + 1)]
-    if len(overlap) < 3:
+    if len(overlap) < 5:
         return None
     door_y = overlap[len(overlap) // 2]
-    grid[door_y][door_x] = DOOR
+    painted = paint_door(grid, (door_x, door_y), (0, 1))
+    if painted is None:
+        return None
+    door_cell, door_span = painted
     plate_a = (2, sy1 - 1)
     plate_b = (min(width - 3, sx1 + 6), min(height - 3, gy0 + 4))
     goal = (width - 2, height - 2)
@@ -972,7 +1041,7 @@ def build_paired_offset(rng: random.Random, seed: int, map_id: str) -> Spec | No
     spec = finish_crate(
         grid, width, height, "x", "west", "east", (agent1, agent2), goal,
         [Plate("plate_0", plate_a, ["door_0"], 0), Plate("plate_1", plate_b, ["door_0"], 1)],
-        [Door("door_0", (door_x, door_y), ["plate_0", "plate_1"])],
+        [Door("door_0", door_cell, ["plate_0", "plate_1"], door_span)],
         [Crate("object_0", box, [push_record(box, (box[0], box[1] - 1), None)], [behind, assist])],
         True, map_id, seed, "paired_offset",
     )
@@ -984,12 +1053,15 @@ def build_paired_offset(rng: random.Random, seed: int, map_id: str) -> Spec | No
 
 
 def build_paired_l(rng: random.Random, seed: int, map_id: str) -> Spec | None:
-    width, height = 22, 16
+    width, height = 24, 18
     grid = blank(width, height)
-    carve_rect(grid, 1, 1, 3, 13)
-    carve_rect(grid, 1, 11, 8, 13)
-    carve_rect(grid, 10, 8, width - 2, 14)
-    grid[12][9] = DOOR
+    carve_rect(grid, 1, 1, 3, 15)
+    carve_rect(grid, 1, 12, 9, 15)
+    carve_rect(grid, 11, 8, width - 2, 16)
+    painted = paint_door(grid, (10, 13), (0, 1))
+    if painted is None:
+        return None
+    door_cell, door_span = painted
     plate_a = (2, 9)
     plate_b = (16, 12)
     box = (2, 4)
@@ -1001,7 +1073,7 @@ def build_paired_l(rng: random.Random, seed: int, map_id: str) -> Spec | None:
     spec = finish_crate(
         grid, width, height, "x", "west", "east", (agent1, agent2), goal,
         [Plate("plate_0", plate_a, ["door_0"], 0), Plate("plate_1", plate_b, ["door_0"], 1)],
-        [Door("door_0", (9, 12), ["plate_0", "plate_1"])],
+        [Door("door_0", door_cell, ["plate_0", "plate_1"], door_span)],
         [Crate("object_0", box, [push_record(box, (2, 5), None)], [behind, assist])],
         True, map_id, seed, "paired_l",
     )
@@ -1102,6 +1174,7 @@ def feature_files(spec: Spec) -> dict[str, dict]:
                     "id": door.id,
                     "x": door.cell[0],
                     "y": door.cell[1],
+                    "cells": [[cell[0], cell[1]] for cell in (door.cell, *door.span)],
                     "opened_by": door.opened_by,
                     "logic": "all" if cross else "any",
                     "mode": door_mode,

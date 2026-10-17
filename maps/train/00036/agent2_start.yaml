@@ -2,7 +2,7 @@ map_id: '00036'
 seed: 3036
 map_type: crate_straight
 note: 복도. 문 앞 발판이 하나이고, 물건을 발판 위로 밀어 문을 연 뒤 지나간다.
-width: 15
+width: 18
 height: 24
 cell_size: 32
 origin: top_left
@@ -20,7 +20,7 @@ color:
 - 150
 - 70
 - 180
-x: 7
+x: 2
 y: 2
 side: north
 region: 0

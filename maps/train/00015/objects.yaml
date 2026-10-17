@@ -2,8 +2,8 @@ map_id: '00015'
 seed: 3015
 map_type: crate_chain
 note: 문이 두 개. 각 문 앞에 발판과 물건이 있어 순서대로 올리고 지나간다.
-width: 14
-height: 32
+width: 16
+height: 34
 cell_size: 32
 origin: top_left
 axes:
@@ -42,20 +42,20 @@ objects:
     requires_both_agents: true
 - id: object_1
   x: 4
-  y: 16
+  y: 18
   pushable: true
   requires_both_agents: true
   pushes_onto_plate: plate_1
   plate_distance: 3
   stand_cells:
   - - 3
-    - 16
+    - 18
   - - 3
-    - 17
+    - 19
   push_neighbors:
   - direction: east
     x: 7
-    y: 16
+    y: 18
     onto_plate: plate_1
     distance: 3
     requires_both_agents: true
